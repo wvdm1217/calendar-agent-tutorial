@@ -4,6 +4,8 @@ The repo is a step by step guide for building a Google Calendar agent of increas
 
 ## Requirements
 
+- Access to a Google Cloud Project and Vertex AI
+
 ## Agent Iterations
 
 1. **CLI:** A CLI that does not use a LLM. 
