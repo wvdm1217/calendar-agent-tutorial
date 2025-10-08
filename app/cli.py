@@ -1,8 +1,11 @@
 from datetime import datetime
+from typing import Annotated
 
 from rich import print
-from typer import Typer
+from typer import Argument, Option, Typer
 
+from app.auth import refresh_token
+from app.google_calendar import create_event as create_calendar_event
 from app.google_calendar import list_events as list_calendar_events
 
 app = Typer()
@@ -39,3 +42,35 @@ def list_events(max_results: int = 10):
         else:
             start_str = start_info["date"]
             print(f"{start_str} (all day) - {event['summary']}")
+
+
+@app.command()
+def create_event(
+    summary: Annotated[
+        str, Argument(help="The summary or title of the event.")
+    ],
+    start_time: Annotated[
+        datetime, Argument(help="The start time of the event in ISO format.")
+    ],
+    end_time: Annotated[
+        datetime, Argument(help="The end time of the event in ISO format.")
+    ],
+    description: Annotated[
+        str | None, Option(help="A description of the event.")
+    ] = None,
+    location: Annotated[
+        str | None, Option(help="The location of the event.")
+    ] = None,
+):
+    """Create a new event in the calendar."""
+    print("Creating event...")
+    create_calendar_event(summary, start_time, end_time, description, location)
+
+
+@app.command()
+def refresh_auth():
+    """Refresh the authentication token."""
+    if refresh_token():
+        print("Authentication token refreshed.")
+    else:
+        print("No authentication token to refresh.")

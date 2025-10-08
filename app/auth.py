@@ -30,3 +30,18 @@ def authenticate():
         with open(settings.token_file, "w") as token:
             token.write(creds.to_json())
     return creds
+
+
+def refresh_token():
+    """Refreshes the authentication token."""
+    creds = None
+    if settings.token_file.exists():
+        creds = Credentials.from_authorized_user_file(
+            settings.token_file, settings.scopes
+        )
+    if creds and creds.refresh_token:
+        creds.refresh(Request())
+        with open(settings.token_file, "w") as token:
+            token.write(creds.to_json())
+        return True
+    return False

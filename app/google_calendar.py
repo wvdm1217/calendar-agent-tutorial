@@ -36,6 +36,37 @@ def list_events(max_results: int = 10) -> Sequence:
         return []
 
 
+def create_event(
+    summary: str,
+    start_time: datetime.datetime,
+    end_time: datetime.datetime,
+    description: str | None = None,
+    location: str | None = None,
+):
+    """Creates an event on the user's calendar."""
+    creds = authenticate()
+    try:
+        service = build("calendar", "v3", credentials=creds)
+        event = {
+            "summary": summary,
+            "location": location,
+            "description": description,
+            "start": {
+                "dateTime": start_time.isoformat(),
+                "timeZone": "UTC",
+            },
+            "end": {
+                "dateTime": end_time.isoformat(),
+                "timeZone": "UTC",
+            },
+        }
+        event = service.events().insert(calendarId="primary", body=event).execute()
+        print(f"Event created: {event.get('htmlLink')}")
+
+    except HttpError as error:
+        print(f"An error occurred: {error}")
+
+
 if __name__ == "__main__":
     events = list_events()
     if not events:

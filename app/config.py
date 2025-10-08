@@ -8,8 +8,9 @@ class Settings(BaseSettings):
     app_name: str = "Calendar Agent"
     credentials_file: Path = Path("credentials.json")
     token_file: Path = Path("token.json")
-    scopes: list[str] = ["https://www.googleapis.com/auth/calendar.readonly"]
+    scopes: list[str] = ["https://www.googleapis.com/auth/calendar"]
     log_level: str = "INFO"
+
 
 @lru_cache
 def get_settings():
