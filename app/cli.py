@@ -4,7 +4,7 @@ from typing import Annotated
 from rich import print
 from typer import Argument, Option, Typer
 
-from app.auth import refresh_token
+from app.auth import authenticate, refresh_token
 from app.google_calendar import create_event as create_calendar_event
 from app.google_calendar import list_events as list_calendar_events
 
@@ -12,13 +12,11 @@ app = Typer()
 
 
 @app.command()
-def hello(name: str):
-    """Say hello to NAME."""
-    print(f"Hello {name}!")
-
-
-@app.command()
-def list_events(max_results: int = 10):
+def list(
+    max_results: Annotated[
+        int, Option(help="The maximum number of events to return.")
+    ] = 10
+):
     """List the next MAX_RESULTS events from the calendar."""
     print("Listing events...")
     events = list_calendar_events(max_results)
@@ -45,7 +43,7 @@ def list_events(max_results: int = 10):
 
 
 @app.command()
-def create_event(
+def create(
     summary: Annotated[
         str, Argument(help="The summary or title of the event.")
     ],
@@ -68,9 +66,11 @@ def create_event(
 
 
 @app.command()
-def refresh_auth():
+def auth():
     """Refresh the authentication token."""
     if refresh_token():
         print("Authentication token refreshed.")
     else:
-        print("No authentication token to refresh.")
+        print("No authentication token found. Starting authentication flow...")
+        authenticate()
+        print("Authentication complete!")

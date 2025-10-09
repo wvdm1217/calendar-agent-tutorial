@@ -10,6 +10,7 @@ class Settings(BaseSettings):
     token_file: Path = Path("token.json")
     scopes: list[str] = ["https://www.googleapis.com/auth/calendar"]
     log_level: str = "INFO"
+    auth_port: int = 8888
 
 
 @lru_cache

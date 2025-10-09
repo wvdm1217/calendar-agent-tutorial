@@ -25,7 +25,17 @@ def authenticate():
             flow = InstalledAppFlow.from_client_secrets_file(
                 settings.credentials_file, settings.scopes
             )
-            creds = flow.run_console()
+            try:
+                creds = flow.run_local_server(
+                    port=settings.auth_port, open_browser=False
+                )
+            except Exception as e:
+                print(f"\nAuthentication error: {e}")
+                print("\nPlease ensure:")
+                print(f"1. Port {settings.auth_port} is accessible")
+                print("2. You've opened the URL in your browser")
+                print("3. The redirect URI is configured in Google Cloud Console")
+                raise
         # Save the credentials for the next run
         with open(settings.token_file, "w") as token:
             token.write(creds.to_json())
