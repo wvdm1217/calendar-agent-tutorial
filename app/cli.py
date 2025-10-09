@@ -5,8 +5,15 @@ from rich import print
 from typer import Argument, Option, Typer
 
 from app.auth import authenticate, refresh_token
-from app.google_calendar import create_event as create_calendar_event
-from app.google_calendar import list_events as list_calendar_events
+from app.google_calendar import (
+    create_event as create_calendar_event,
+)
+from app.google_calendar import (
+    delete_event as delete_calendar_event,
+)
+from app.google_calendar import (
+    list_events as list_calendar_events,
+)
 
 app = Typer()
 
@@ -35,11 +42,11 @@ def list(
             formatted_start = start_dt.strftime("%Y-%m-%d %H:%M")
             formatted_end = end_dt.strftime("%H:%M")
             print(
-                f"{formatted_start} - {formatted_end} ({duration}) - {event['summary']}"
+                f"{formatted_start} - {formatted_end} ({duration}) - {event['summary']} (ID: {event['id']})"
             )
         else:
             start_str = start_info["date"]
-            print(f"{start_str} (all day) - {event['summary']}")
+            print(f"{start_str} (all day) - {event['summary']} (ID: {event['id']})")
 
 
 @app.command()
@@ -63,6 +70,15 @@ def create(
     """Create a new event in the calendar."""
     print("Creating event...")
     create_calendar_event(summary, start_time, end_time, description, location)
+
+
+@app.command()
+def delete(
+    event_id: Annotated[str, Argument(help="The ID of the event to delete.")]
+):
+    """Delete an event from the calendar."""
+    print(f"Deleting event {event_id}...")
+    delete_calendar_event(event_id)
 
 
 @app.command()

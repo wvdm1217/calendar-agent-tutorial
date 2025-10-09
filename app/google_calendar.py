@@ -67,6 +67,18 @@ def create_event(
         print(f"An error occurred: {error}")
 
 
+def delete_event(event_id: str):
+    """Deletes an event from the user's calendar."""
+    creds = authenticate()
+    try:
+        service = build("calendar", "v3", credentials=creds)
+        service.events().delete(calendarId="primary", eventId=event_id).execute()
+        print("Event deleted.")
+
+    except HttpError as error:
+        print(f"An error occurred: {error}")
+
+
 if __name__ == "__main__":
     events = list_events()
     if not events:

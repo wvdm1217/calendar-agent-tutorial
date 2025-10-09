@@ -32,7 +32,7 @@ The repo is a step by step guide for building a Google Calendar agent of increas
 
 4. **First-time authentication:**
    ```bash
-   calendar-agent list-events
+   cal list
    ```
    This will prompt you to authenticate with Google and create a `token.json` file.
 
@@ -45,7 +45,7 @@ The CLI provides commands to interact with your Google Calendar without using an
 List upcoming events from your calendar:
 
 ```bash
-calendar-agent list-events [OPTIONS]
+cal list [OPTIONS]
 ```
 
 **Options:**
@@ -53,14 +53,14 @@ calendar-agent list-events [OPTIONS]
 
 **Example:**
 ```bash
-calendar-agent list-events --max-results 20
+cal list --max-results 20
 ```
 
 **Output:**
 ```
-2025-10-08 09:00 - 09:30 (0:30:00) - GenAI Standup
-2025-10-08 09:30 - 10:00 (0:30:00) - Code Review
-2025-10-08 (all day) - Office
+2025-10-08 09:00 - 09:30 (0:30:00) - GenAI Standup (ID: 12345)
+2025-10-08 09:30 - 10:00 (0:30:00) - Code Review (ID: 67890)
+2025-10-08 (all day) - Office (ID: 11223)
 ```
 
 ### Create Event
@@ -68,7 +68,7 @@ calendar-agent list-events --max-results 20
 Create a new event in your calendar:
 
 ```bash
-calendar-agent create-event SUMMARY START_TIME END_TIME [OPTIONS]
+cal create SUMMARY START_TIME END_TIME [OPTIONS]
 ```
 
 **Arguments:**
@@ -82,9 +82,25 @@ calendar-agent create-event SUMMARY START_TIME END_TIME [OPTIONS]
 
 **Example:**
 ```bash
-calendar-agent create-event "Team Meeting" "2025-10-09T14:00:00" "2025-10-09T15:00:00" \
+cal create "Team Meeting" "2025-10-09T14:00:00" "2025-10-09T15:00:00" \
   --description "Discuss Q4 planning" \
   --location "Conference Room A"
+```
+
+### Delete Event
+
+Delete an event from your calendar:
+
+```bash
+cal delete EVENT_ID
+```
+
+**Arguments:**
+- `EVENT_ID`: The ID of the event to delete (required)
+
+**Example:**
+```bash
+cal delete 12345
 ```
 
 ### Refresh Authentication
@@ -92,7 +108,7 @@ calendar-agent create-event "Team Meeting" "2025-10-09T14:00:00" "2025-10-09T15:
 Manually refresh your authentication token:
 
 ```bash
-calendar-agent refresh-auth
+cal auth
 ```
 
 This command is useful when you need to update your access token without waiting for it to expire.
