@@ -2,9 +2,11 @@ from datetime import datetime
 from typing import Annotated
 
 from rich.console import Console
+from rich.panel import Panel
 from rich.table import Table
 from typer import Argument, Option, Typer
 
+from app.agent import agent
 from app.auth import authenticate, refresh_token
 from app.google_calendar import (
     create_event as create_calendar_event,
@@ -30,6 +32,65 @@ from app.google_calendar import (
 
 app = Typer()
 console = Console()
+
+
+@app.command()
+def chat():
+    """Start a chat session with the agent."""
+    console.print("Starting chat session. Type 'exit' to end.")
+    messages = []
+    while True:
+        query = input("You: ")
+        if query.lower() == "exit":
+            break
+        messages.append({"role": "user", "content": query})
+        inputs = {"messages": messages}
+        all_messages = []
+        
+        for chunk in agent.stream(inputs, stream_mode="updates"):
+            for step, data in chunk.items():
+                # Collect all messages from this step
+                all_messages = data["messages"]
+                ai_message = data["messages"][-1]
+                
+                if step == "model":
+                    # Check if this is a tool call
+                    if hasattr(ai_message, 'tool_calls') and ai_message.tool_calls:
+                        for tool_call in ai_message.tool_calls:
+                            console.print(
+                                Panel(
+                                    f"[cyan]Calling: [bold]{tool_call['name']}[/bold]\nArguments: {tool_call['args']}",
+                                    title="🔧 Tool Call",
+                                    border_style="cyan",
+                                    expand=False,
+                                )
+                            )
+                    # Check if this is a text response
+                    elif ai_message.content:
+                        # Handle both string content and list of content blocks
+                        if isinstance(ai_message.content, str):
+                            console.print(f"[bold green]Agent:[/bold green] {ai_message.content}")
+                        elif isinstance(ai_message.content, list):
+                            for block in ai_message.content:
+                                if isinstance(block, dict) and block.get('type') == 'text':
+                                    console.print(f"[bold green]Agent:[/bold green] {block['text']}")
+                
+                elif step == "tools":
+                    # Display tool output
+                    console.print(
+                        Panel(
+                            f"[magenta]{ai_message.content}",
+                            title="📤 Tool Output",
+                            border_style="magenta",
+                            expand=False,
+                        )
+                    )
+
+        # Update messages with all messages from the agent's execution
+        # This includes tool calls, tool responses, and final AI responses
+        if all_messages:
+            messages = all_messages
+        print()
 
 
 @app.command(name="list")

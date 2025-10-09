@@ -8,6 +8,8 @@ dependencies = [
     "google-api-python-client>=2.184.0",
     "google-auth-httplib2>=0.2.0",
     "google-auth-oauthlib>=1.2.2",
+    "langchain==1.0.0a12",
+    "langchain-google-genai>=3.0.0a1",
     "pydantic-settings>=2.11.0",
     "typer>=0.19.2",
 ]
